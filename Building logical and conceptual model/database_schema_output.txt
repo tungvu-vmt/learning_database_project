@@ -1,0 +1,510 @@
+SQL> DROP TABLE country CASCADE CONSTRAINTS;
+
+TABLE dropped.
+
+SQL> DROP TABLE driver CASCADE CONSTRAINTS;
+
+TABLE dropped.
+
+SQL> DROP TABLE driver_language CASCADE CONSTRAINTS;
+
+TABLE dropped.
+
+SQL> DROP TABLE driver_training CASCADE CONSTRAINTS;
+
+TABLE dropped.
+
+SQL> DROP TABLE language CASCADE CONSTRAINTS;
+
+TABLE dropped.
+
+SQL> DROP TABLE location CASCADE CONSTRAINTS;
+
+TABLE dropped.
+
+SQL> DROP TABLE official CASCADE CONSTRAINTS;
+
+TABLE dropped.
+
+SQL> DROP TABLE training CASCADE CONSTRAINTS;
+
+TABLE dropped.
+
+SQL> DROP TABLE trip CASCADE CONSTRAINTS;
+
+TABLE dropped.
+
+SQL> DROP TABLE vehicle CASCADE CONSTRAINTS;
+
+TABLE dropped.
+
+SQL> DROP TABLE vehicle_feature CASCADE CONSTRAINTS;
+
+TABLE dropped.
+
+SQL> -- predefined type, no DDL - MDSYS.SDO_GEOMETRY
+SQL> -- predefined type, no DDL - XMLTYPE
+SQL> CREATE TABLE country (
+  2      country_code       CHAR(3 CHAR) NOT NULL,
+  3      country_name       VARCHAR2(30 CHAR) NOT NULL,
+  4      country_population NUMBER(10) NOT NULL
+  5  );
+
+TABLE created.
+
+SQL> COMMENT ON COLUMN country.country_code IS
+  2      'National Olympic Committee code';
+Comment created.
+
+SQL> COMMENT ON COLUMN country.country_name IS
+  2      'country''s name';
+Comment created.
+
+SQL> COMMENT ON COLUMN country.country_population IS
+  2      'country''s population';
+Comment created.
+
+SQL> ALTER TABLE country ADD CONSTRAINT country_pk PRIMARY KEY ( country_code );
+
+TABLE altered.
+
+SQL> CREATE TABLE driver (
+  2      driver_id                CHAR(10 CHAR) NOT NULL,
+  3      driver_gname             VARCHAR2(30 CHAR) NOT NULL,
+  4      driver_fname             VARCHAR2(30) NOT NULL,
+  5      driver_lice_num          CHAR(18 CHAR) NOT NULL,
+  6      driver_birthdate         DATE NOT NULL,
+  7      driver_level_of_security CHAR(1 CHAR) DEFAULT 'R' NOT NULL,
+  8      driver_flag              CHAR(1 CHAR) DEFAULT 'N' NOT NULL,
+  9      driver_num_of_training   NUMBER(2) NOT NULL
+  10  );
+
+TABLE created.
+
+SQL> ALTER TABLE driver
+  2      ADD CONSTRAINT driver_security_chk CHECK ( driver_level_of_security IN ( 'F', 'R' ) );
+
+TABLE altered.
+
+SQL> ALTER TABLE driver
+  2      ADD CONSTRAINT driver_flag_suspension_chk CHECK ( driver_flag IN ( 'N', 'Y' ) );
+
+TABLE altered.
+
+SQL> COMMENT ON COLUMN driver.driver_id IS
+  2      'unique driver id';
+Comment created.
+
+SQL> COMMENT ON COLUMN driver.driver_gname IS
+  2      'driver''s given name';
+Comment created.
+
+SQL> COMMENT ON COLUMN driver.driver_fname IS
+  2      'driver''s family name';
+Comment created.
+
+SQL> COMMENT ON COLUMN driver.driver_lice_num IS
+  2      '18 character-long licesence number';
+Comment created.
+
+SQL> COMMENT ON COLUMN driver.driver_birthdate IS
+  2      'driver''s date of birth';
+Comment created.
+
+SQL> COMMENT ON COLUMN driver.driver_level_of_security IS
+  2      'driver''s level of security, F: Full, R: Restricted';
+Comment created.
+
+SQL> COMMENT ON COLUMN driver.driver_flag IS
+  2      'driver''s flag for suspension, Y: Suspended, N: Not suspended, default is N';
+Comment created.
+
+SQL> COMMENT ON COLUMN driver.driver_num_of_training IS
+  2      'driver''s total number of training completed';
+Comment created.
+
+SQL> ALTER TABLE driver ADD CONSTRAINT driver_pk PRIMARY KEY ( driver_id );
+
+TABLE altered.
+
+SQL> CREATE TABLE driver_language (
+  2      driver_id     CHAR(10 CHAR) NOT NULL,
+  3      language_code CHAR(2 CHAR) NOT NULL
+  4  );
+
+TABLE created.
+
+SQL> COMMENT ON COLUMN driver_language.driver_id IS
+  2      'unique driver id';
+Comment created.
+
+SQL> COMMENT ON COLUMN driver_language.language_code IS
+  2      'language code';
+Comment created.
+
+SQL> ALTER TABLE driver_language ADD CONSTRAINT driver_language_pk PRIMARY KEY ( driver_id,
+  2                                                                              language_code );
+
+TABLE altered.
+
+SQL> CREATE TABLE driver_training (
+  2      dt_no                    NUMBER(4) NOT NULL,
+  3      driver_id                CHAR(10 CHAR) NOT NULL,
+  4      training_code            CHAR(10 CHAR) NOT NULL,
+  5      driver_training_datetime DATE NOT NULL
+  6  );
+
+TABLE created.
+
+SQL> COMMENT ON COLUMN driver_training.driver_id IS
+  2      'unique driver id';
+Comment created.
+
+SQL> COMMENT ON COLUMN driver_training.training_code IS
+  2      'training code';
+Comment created.
+
+SQL> COMMENT ON COLUMN driver_training.driver_training_datetime IS
+  2      'date and time when a driver completes a training module';
+Comment created.
+
+SQL> ALTER TABLE driver_training ADD CONSTRAINT driver_training_pk PRIMARY KEY ( dt_no );
+
+TABLE altered.
+
+SQL> ALTER TABLE driver_training
+  2      ADD CONSTRAINT driver_training_nk UNIQUE ( driver_training_datetime,
+  3                                                 driver_id,
+  4                                                 training_code );
+
+TABLE altered.
+
+SQL> CREATE TABLE language (
+  2      language_code CHAR(2 CHAR) NOT NULL,
+  3      language_name VARCHAR2(30 CHAR) NOT NULL
+  4  );
+
+TABLE created.
+
+SQL> COMMENT ON COLUMN language.language_code IS
+  2      'language code';
+Comment created.
+
+SQL> COMMENT ON COLUMN language.language_name IS
+  2      'language name';
+Comment created.
+
+SQL> ALTER TABLE language ADD CONSTRAINT language_pk PRIMARY KEY ( language_code );
+
+TABLE altered.
+
+SQL> CREATE TABLE location (
+  2      loc_id      NUMBER(2) NOT NULL,
+  3      loc_name    VARCHAR2(50 CHAR) NOT NULL,
+  4      loc_type    VARCHAR2(30 CHAR) NOT NULL,
+  5      loc_address VARCHAR2(100 CHAR) NOT NULL
+  6  );
+
+TABLE created.
+
+SQL> COMMENT ON COLUMN location.loc_id IS
+  2      'location id';
+Comment created.
+
+SQL> COMMENT ON COLUMN location.loc_name IS
+  2      'location''s name';
+Comment created.
+
+SQL> COMMENT ON COLUMN location.loc_type IS
+  2      'location type';
+Comment created.
+
+SQL> COMMENT ON COLUMN location.loc_address IS
+  2      'location address';
+Comment created.
+
+SQL> ALTER TABLE location ADD CONSTRAINT location_pk PRIMARY KEY ( loc_id );
+
+TABLE altered.
+
+SQL> CREATE TABLE official (
+  2      official_id    CHAR(7 CHAR) NOT NULL,
+  3      official_fname VARCHAR2(30 CHAR) NOT NULL,
+  4      official_gname VARCHAR2(30 CHAR) NOT NULL,
+  5      official_role  VARCHAR2(30 CHAR) NOT NULL,
+  6      country_code   CHAR(3 CHAR) NOT NULL,
+  7      manager_id     CHAR(7 CHAR)
+  8  );
+
+TABLE created.
+
+SQL> COMMENT ON COLUMN official.official_id IS
+  2      'official''s olympic id';
+Comment created.
+
+SQL> COMMENT ON COLUMN official.official_fname IS
+  2      'official''s family name';
+Comment created.
+
+SQL> COMMENT ON COLUMN official.official_gname IS
+  2      'official''s given name';
+Comment created.
+
+SQL> COMMENT ON COLUMN official.official_role IS
+  2      'official''s role';
+Comment created.
+
+SQL> COMMENT ON COLUMN official.country_code IS
+  2      'National Olympic Committee code';
+Comment created.
+
+SQL> COMMENT ON COLUMN official.manager_id IS
+  2      'official''s olympic id';
+Comment created.
+
+SQL> ALTER TABLE official ADD CONSTRAINT official_pk PRIMARY KEY ( official_id );
+
+TABLE altered.
+
+SQL> CREATE TABLE training (
+  2      training_code          CHAR(10 CHAR) NOT NULL,
+  3      training_name          VARCHAR2(50 CHAR) NOT NULL,
+  4      training_description   VARCHAR2(100 CHAR) NOT NULL,
+  5      training_expiry_period NUMBER(2),
+  6      training_length        NUMBER(1) NOT NULL
+  7  );
+
+TABLE created.
+
+SQL> COMMENT ON COLUMN training.training_code IS
+  2      'training code';
+Comment created.
+
+SQL> COMMENT ON COLUMN training.training_name IS
+  2      'training module''s name';
+Comment created.
+
+SQL> COMMENT ON COLUMN training.training_description IS
+  2      'training module''s description';
+Comment created.
+
+SQL> COMMENT ON COLUMN training.training_expiry_period IS
+  2      'training module''s expiry period';
+Comment created.
+
+SQL> COMMENT ON COLUMN training.training_length IS
+  2      'training module''s length';
+Comment created.
+
+SQL> ALTER TABLE training ADD CONSTRAINT training_pk PRIMARY KEY ( training_code );
+
+TABLE altered.
+
+SQL> CREATE TABLE trip (
+  2      trip_id                    NUMBER(4) NOT NULL,
+  3      trip_num_of_psng           NUMBER(2) NOT NULL,
+  4      trip_intended_pickup_time  DATE NOT NULL,
+  5      trip_actual_pickup_time    DATE,
+  6      trip_intended_dropoff_time DATE NOT NULL,
+  7      trip_actual_dropoff_time   DATE,
+  8      driver_id                  CHAR(10 CHAR) NOT NULL,
+  9      official_id                CHAR(7 CHAR) NOT NULL,
+  10      pickup_loc_id              NUMBER(2) NOT NULL,
+  11      dropoff_loc_id             NUMBER(2) NOT NULL,
+  12      language_code              CHAR(2 CHAR) NOT NULL,
+  13      vehicle_no                 CHAR(17 CHAR) NOT NULL
+  14  );
+
+TABLE created.
+
+SQL> COMMENT ON COLUMN trip.trip_id IS
+  2      'trip id';
+Comment created.
+
+SQL> COMMENT ON COLUMN trip.trip_num_of_psng IS
+  2      'number of passengers on the trip';
+Comment created.
+
+SQL> COMMENT ON COLUMN trip.trip_intended_pickup_time IS
+  2      'trip intended pick up date and time';
+Comment created.
+
+SQL> COMMENT ON COLUMN trip.trip_actual_pickup_time IS
+  2      'Actual pick-up time of trip';
+Comment created.
+
+SQL> COMMENT ON COLUMN trip.trip_intended_dropoff_time IS
+  2      'Intended drop-off time of trip';
+Comment created.
+
+SQL> COMMENT ON COLUMN trip.trip_actual_dropoff_time IS
+  2      'trip actual dropoff time';
+Comment created.
+
+SQL> COMMENT ON COLUMN trip.driver_id IS
+  2      'unique driver id';
+Comment created.
+
+SQL> COMMENT ON COLUMN trip.official_id IS
+  2      'official''s olympic id';
+Comment created.
+
+SQL> COMMENT ON COLUMN trip.pickup_loc_id IS
+  2      'location id';
+Comment created.
+
+SQL> COMMENT ON COLUMN trip.dropoff_loc_id IS
+  2      'location id';
+Comment created.
+
+SQL> COMMENT ON COLUMN trip.language_code IS
+  2      'language code';
+Comment created.
+
+SQL> COMMENT ON COLUMN trip.vehicle_no IS
+  2      '17 character-long vehicle number';
+Comment created.
+
+SQL> ALTER TABLE trip ADD CONSTRAINT trip_pk PRIMARY KEY ( trip_id );
+
+TABLE altered.
+
+SQL> CREATE TABLE vehicle (
+  2      vehicle_no          CHAR(17 CHAR) NOT NULL,
+  3      vehicle_plate       CHAR(7 CHAR) NOT NULL,
+  4      vehicle_make        VARCHAR2(20 CHAR) NOT NULL,
+  5      vehicle_model       VARCHAR2(30 CHAR) NOT NULL,
+  6      vehicle_odometer    NUMBER(6) NOT NULL,
+  7      vehicle_num_of_psng NUMBER(2) NOT NULL,
+  8      vehicle_year        DATE NOT NULL
+  9  );
+
+TABLE created.
+
+SQL> COMMENT ON COLUMN vehicle.vehicle_no IS
+  2      '17 character-long vehicle number';
+Comment created.
+
+SQL> COMMENT ON COLUMN vehicle.vehicle_plate IS
+  2      '7 character-long vehicle plate';
+Comment created.
+
+SQL> COMMENT ON COLUMN vehicle.vehicle_make IS
+  2      'vehicle''s manufacturer';
+Comment created.
+
+SQL> COMMENT ON COLUMN vehicle.vehicle_model IS
+  2      'vehicle model';
+Comment created.
+
+SQL> COMMENT ON COLUMN vehicle.vehicle_odometer IS
+  2      'vehicle odometer reading';
+Comment created.
+
+SQL> COMMENT ON COLUMN vehicle.vehicle_num_of_psng IS
+  2      'vehicle maximum carrying capacity';
+Comment created.
+
+SQL> COMMENT ON COLUMN vehicle.vehicle_year IS
+  2      'vehicle year of manufacture';
+Comment created.
+
+SQL> ALTER TABLE vehicle ADD CONSTRAINT vehicle_pk PRIMARY KEY ( vehicle_no );
+
+TABLE altered.
+
+SQL> CREATE TABLE vehicle_feature (
+  2      vehicle_no CHAR(17 CHAR) NOT NULL,
+  3      vf_name    VARCHAR2(100) NOT NULL
+  4  );
+
+TABLE created.
+
+SQL> COMMENT ON COLUMN vehicle_feature.vehicle_no IS
+  2      '17 character-long vehicle number';
+Comment created.
+
+SQL> ALTER TABLE vehicle_feature ADD CONSTRAINT vehicle_feature_pk PRIMARY KEY ( vehicle_no,
+  2                                                                              vf_name );
+
+TABLE altered.
+
+SQL> ALTER TABLE official
+  2      ADD CONSTRAINT country_has_member_official FOREIGN KEY ( country_code )
+  3          REFERENCES country ( country_code );
+
+TABLE altered.
+
+SQL> ALTER TABLE trip
+  2      ADD CONSTRAINT driver_drive_trip FOREIGN KEY ( driver_id )
+  3          REFERENCES driver ( driver_id );
+
+TABLE altered.
+
+SQL> ALTER TABLE driver_training
+  2      ADD CONSTRAINT driver_enrolls_in_training FOREIGN KEY ( driver_id )
+  3          REFERENCES driver ( driver_id );
+
+TABLE altered.
+
+SQL> ALTER TABLE driver_language
+  2      ADD CONSTRAINT driver_speaks_language FOREIGN KEY ( driver_id )
+  3          REFERENCES driver ( driver_id );
+
+TABLE altered.
+
+SQL> ALTER TABLE driver_language
+  2      ADD CONSTRAINT language_is_spoken_by_driver FOREIGN KEY ( language_code )
+  3          REFERENCES language ( language_code );
+
+TABLE altered.
+
+SQL> ALTER TABLE trip
+  2      ADD CONSTRAINT language_trip FOREIGN KEY ( language_code )
+  3          REFERENCES language ( language_code );
+
+TABLE altered.
+
+SQL> ALTER TABLE trip
+  2      ADD CONSTRAINT location_dropoff_trip FOREIGN KEY ( dropoff_loc_id )
+  3          REFERENCES location ( loc_id );
+
+TABLE altered.
+
+SQL> ALTER TABLE trip
+  2      ADD CONSTRAINT location_pickup_trip FOREIGN KEY ( pickup_loc_id )
+  3          REFERENCES location ( loc_id );
+
+TABLE altered.
+
+SQL> ALTER TABLE trip
+  2      ADD CONSTRAINT official FOREIGN KEY ( official_id )
+  3          REFERENCES official ( official_id );
+
+TABLE altered.
+
+SQL> ALTER TABLE official
+  2      ADD CONSTRAINT official_official FOREIGN KEY ( manager_id )
+  3          REFERENCES official ( official_id );
+
+TABLE altered.
+
+SQL> ALTER TABLE driver_training
+  2      ADD CONSTRAINT training_completedby_driver FOREIGN KEY ( training_code )
+  3          REFERENCES training ( training_code );
+
+TABLE altered.
+
+SQL> ALTER TABLE vehicle_feature
+  2      ADD CONSTRAINT vehicle_has_feature FOREIGN KEY ( vehicle_no )
+  3          REFERENCES vehicle ( vehicle_no );
+
+TABLE altered.
+
+SQL> ALTER TABLE trip
+  2      ADD CONSTRAINT vehicle_is_used_in_trip FOREIGN KEY ( vehicle_no )
+  3          REFERENCES vehicle ( vehicle_no );
+
+TABLE altered.
+
+SQL> set echo off
